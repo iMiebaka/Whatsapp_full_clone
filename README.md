@@ -7,20 +7,24 @@ The python framework used in this build in Django
 
 <h5> Warning: This app is not a production </h5>
 
-Note: Make sure you have Redis Installed
+Note: Make sure you have Redis Installed (Version >=6)
 
 Linux/ Unix Installation
-Make sure your apt package is up to date `sudo apt update`
-Install Redis Server `sudo apt-get install redis-server`
-Check version and ensure your version is up to >=6 `redis-cli -v`
+```shell
+sudo apt update
+sudo apt-get install redis-server
+redis-cli -v
+```
 
 Installation
-* Create a python virtual env `python3 -m venv env`
-* Activate the virtual enviroment `source env/bin/activate`
-* Downloading the repo
-* cd to the directry `cd Whatsapp_full_clone/`
+```shell
+python3 -m venv env
+source env/bin/activate
+git clone https://github.com/triple07even/Whatsapp_full_clone
+cd Whatsapp_full_clone/
+```
   * Install all dependencies required: `pip install -r requirements.txt`
   * Open two command line window
     * For the first window `python manage.py runserver 0:8000`
     * On the second window `celery -A mysite worker -l INFO`
-* Open your browser and enter <a> http://localhost.com:8000</a>
+* Open your browser and enter <a>http://localhost.com:8000</a>
