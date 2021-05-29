@@ -23,4 +23,4 @@ Installation
   * Open two command line window
     * For the first window `python manage.py runserver 0:8000`
     * On the second window `celery -A mysite worker -l INFO`
-* Open your browser and enter `http://localhost.com:8000`
+* Open your browser and enter <a> http://localhost.com:8000</a>
