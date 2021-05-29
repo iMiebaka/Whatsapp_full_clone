@@ -1,6 +1,6 @@
 <h1 align="center">WhatsApp Clone Using Javascript, Python and Redis</h1>
 
-<p align="center"><img width="100" src="https://github.com/triple07even/Whatsapp_full_clone/blob/main/private_chat_screenshot.png" alt="Private chat screenshot"></p>
+<p align="center"><img width="100%" src="https://github.com/triple07even/Whatsapp_full_clone/blob/main/private_chat_screenshot.png" alt="Private chat screenshot"></p>
 
 This project is a Whatsapp clone using JavaScript and Python
 The python framework used in this build in Django
