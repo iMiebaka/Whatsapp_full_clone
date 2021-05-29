@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+  <style>
+    html,
+    body {
+      /* position: relative; */
+      height: 100%;
+    }
+
+    /* body {
+      background: #eee;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    } */
+
+    .swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <a href={% url 'chat_zone:index' %}>
+
+        <div class="app-title">
+          <span class=" icon-arrow_back" id="close_chat_to_menu2"> Add to Chat
+        </div>
+        </span>
+      </a>
+      <!-- <img src="images/me.jpg" /> -->
+      <div class="sidebar-header-icons">
+        <!-- <img src="images/search-icon.svg" /> -->
+        <a href="{% url 'accounts:add_options' 1 %}">
+          <span class="icon-add"></span>
+        </a>
+        <!-- <span class="icon-edit"></span> -->
+        <span class="icon-ellipsis-v"></span>
+
+        <!-- <img src="images/menu-icon.svg" /> -->
+      </div>
+    </div>
+    <div class="chats">
+      <a href="{% url 'accounts:add_options' 1 %}">
+        <div class="chat">
+          <div class="chat-left">
+            <img src="{% static 'images/default_image.jpg' %}" />
+          </div>
+          <div class="chat-right">
+            <div class="chat-right-top">
+              <span class="contact-name">New Contact</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <a href="{% url 'accounts:add_options' 2 %}">
+        <div class="chat">
+          <div class="chat-left">
+            <img src="{% static 'images/default_group_image.jpg' %}" />
+          </div>
+          <div class="chat-right">
+            <div class="chat-right-top">
+              <span class="contact-name">Create Group</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      {% for user_detail in contacts_details %}
+      <a href="{% url 'chat_zone:private_room' user_detail.profile.remote_channel_name %}">
+        <div class="chat">
+          <div class="chat-left">
+            <img src="{{user_detail.profile.cover_image.url}}" />
+          </div>
+          <div class="chat-right">
+            <div class="chat-right-top">
+              <span class="contact-name">{{user_detail.profile.contact_name}}</span>
+            </div>
+            <div class="chat-right-bottom">
+              <div class="chat-right-bottom-left">
+                <span class="chat-message">{{user_detail.profile.about}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  <!-- SB -->
+  <div id="snackbar"></div>
+
+  <script>
+
+
+  </script>
+
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+
+</body>
+
+</html>

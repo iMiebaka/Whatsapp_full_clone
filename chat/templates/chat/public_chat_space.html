@@ -1,0 +1,308 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="main">
+      <!-- Main chat window header -->
+      <div class="chat-window-header">
+        <div class="chat-window-header-left">
+          <a href={% url 'chat_zone:index' %}>
+            <span class=" icon-arrow_back" id="close_chat_to_menu"></span>
+            <img class="chat-window-contact-image" src="{{group_name.cover_image.url}}" />
+          </a>
+          <!-- <a href="#" id="go-to-user"></a> -->
+          <div class="contact-name-and-status-container">
+            <span class="chat-window-contact-name">{{group_name.chat_room_name}}</span>
+            <span id="room_status" class="chat-window-contact-status">{{group_members}}</span>
+          </div>
+        </div>
+        <div class="chat-window-header-right">
+          <span class="icon-video-camera"></span>
+          <span class="icon-phone"></span>
+          <span class="chat-window-menu-icon icon-ellipsis-v"></span>
+        </div>
+      </div>
+      <!-- Chat window -->
+      <div class="chat-window" id="chat-window">
+        <!-- New Messages come here -->
+
+        {% for message in chat_messages %}
+        {% if message.sent_by == user %}
+        <div class="sender">
+          <span class="sender-message-tail"><img src="{% static 'images/message-tail-sender.svg' %}" /></span>
+          <span class="sender-message">{{message.media}}</span>
+          <span class="message-time">{{message.created_on.time}}</span>
+          <span class="message-status" id="status_{{message.message_id}}"><img src="{% static 'images/single-check.svg'%}" /></span>
+        </div>
+        {% else %}
+        <div class="receiver">
+          <span class="receiver-message-tail"><img src="{% static 'images/message-tail-receiver.svg' %}" /></span>
+          <span class="receiver-by">{{message.contact_name_typing}}</span>
+          <p></p>
+          <span class="receiver-message">{{message.media}}</span>
+          <span class="message-time">{{message.created_on.time}}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+
+        <div id="md-20-spacer" class="md-20-spacer">
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+      </div>
+      <!-- Type message bar -->
+      <div class="type-message-bar">
+        <div class="type-message-bar-left">
+          <img src="{% static 'images/icons.svg' %}" />
+          <img src="{% static 'images/attach-icon.svg' %}" />
+        </div>
+        <div class="type-message-bar-center">
+          <input type="text" oninput="message_text_box(this.value)" id="message_text_box" placeholder="Type a message" />
+        </div>
+        <div class="type-message-bar-right">
+          <button type="button" id="send_message_button" name="button" onclick="send_message_button()">
+            <span id="test_voice_note" class="icon-microphone"></span>
+            <!-- <span class="icon-send2"></span> -->
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="snackbar"></div>
+
+  <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/md5.js' %}"></script>
+
+  <script type="text/javascript">
+    // document.getElementById('message_text_box').focus()
+    var message_id = ''
+    var session_key = md5('chat_app' + Date());
+    $('#message_text_box').focus();
+    const own_user_number = '{{own_user_number}}'
+    const home_channel_name = '{{home_channel_name}}'
+    const phonebook = JSON.parse('{{phonebook | safe}}')
+
+    if ($('#message_text_box').val() === '') {
+      var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+    } else {
+      var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-send2')
+    }
+
+    document.getElementById('message_text_box').addEventListener("keydown", function(e) {
+      if (e.keyCode == 13) {
+        add_message()
+      }
+    });
+
+    function message_text_box(value) {
+      if (value === '') {
+        var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+        user_typing_socket.send(JSON.stringify({
+          'status': false,
+          'file_type': 'Text',
+          'room_channel_name': roomName,
+          'home_channel_name': home_channel_name,
+          'own_user_number': own_user_number,
+          'scope': 'public'
+
+        }));
+
+      } else {
+        var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-send2')
+        user_typing_socket.send(JSON.stringify({
+          'status': true,
+          'file_type': 'Text',
+          'room_channel_name': roomName,
+          'home_channel_name': home_channel_name,
+          'own_user_number': own_user_number,
+          'scope': 'public'
+        }));
+      }
+    }
+
+    function add_message() {
+      var message = $('#message_text_box').val().trim()
+      message_id = md5(message + Date())
+      if (message != '') {
+        try {
+          document.getElementById('md-20-spacer').remove()
+        } catch (error) {}
+        let time_stamp = new Date();
+        time_stamp = time_stamp.getHours() + ":" + time_stamp.getMinutes()
+        $('.chat-window').append("<div class='sender' id=" + message_id + ">" +
+          "<span class='sender-message-tail'><img src='{% static 'images/message-tail-sender.svg'%}' /></span>" +
+          "<span class='sender-message'>" + $('#message_text_box').val() + "</span>" +
+          "<span class='message-time'>" + time_stamp + "</span>" +
+          "<span class='message-status'><img src='{% static 'images/single-check.svg'%}' /></span>  </div>"
+        );
+        $('.chat-window').append('<div id="md-20-spacer" class="md-20-spacer">' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '</div>'
+        );
+        chatSocket.send(JSON.stringify({
+          'file_type': 'Text',
+          'message': message,
+          'message_id': message_id,
+          'time_stamp': time_stamp,
+          'room_channel_name': roomName,
+          'home_channel_name': home_channel_name,
+          'own_user_number': own_user_number
+          // 'home_channel_name': home_channel_name,
+
+        }));
+        document.getElementById('message_text_box').value = ''
+      }
+      document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+      document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+    }
+
+    function send_message_button() {
+      add_message()
+    }
+
+    const roomName = '{{room_name}}'
+    const home_channel = '{{home_channel_name}}'
+    var ws_scheme = window.location.protocol === "https:" ? "wss://" : "ws://"
+
+    const chatSocket = new WebSocket(
+      ws_scheme +
+      window.location.host +
+      '/ws/public_chat/' +
+      roomName +
+      '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      var contact_details = ''
+      for (let i = 0; i < phonebook.length; i++) {
+        if (phonebook[i][1] == data.own_user_number) {
+          contact_details = phonebook[i][0]
+          break
+        } else {
+          contact_details = data.own_user_number
+        }
+      }
+      try {
+        document.getElementById('md-20-spacer').remove()
+      } catch (error) {
+        //
+      }
+      if (message_id === data.message_id) {
+        // return
+      } else if (message_id == '') {
+        $('.chat-window').append("<div class='receiver'>" +
+          "<span class='receiver-message-tail'><img src='{% static 'images/message-tail-receiver.svg' %}' /></span>" +
+          "<span class='receiver-by'>" + contact_details + "</span>" +
+          "<p></p>" +
+          "<span class='receiver-message'>" + data.message + "</span>" +
+          "<span class='message-time'>" + data.time_stamp + "</span>"
+        );
+        $('.chat-window').append('<div id="md-20-spacer" class="md-20-spacer">' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '</div>'
+        );
+        message_id = data.message_id
+        document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+      } else if (message_id != data.message_id) {
+        $('.chat-window').append("<div class='receiver'>" +
+          "<span class='receiver-message-tail'><img src='{% static 'images/message-tail-receiver.svg' %}' /></span>" +
+          "<span class='receiver-by'>" + contact_details + "</span>" +
+          "<p></p>" +
+          "<span class='receiver-message'>" + data.message + "</span>" +
+          "<span class='message-time'>" + data.time_stamp + "</span>"
+        );
+        $('.chat-window').append('<div id="md-20-spacer" class="md-20-spacer">' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '<br>' +
+          '</div>'
+        );
+        message_id = data.message_id
+        document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+      } else {
+        console.log('Something went wrong');
+      }
+    }
+
+    chatSocket.onclose = function(e) {
+      console.error('Chat socket 1 closed unexpectedly');
+    };
+
+    const user_typing_socket = new WebSocket(
+      ws_scheme +
+      window.location.host +
+      '/ws/typing-notification/' +
+      roomName +
+      '/'
+    );
+
+    user_typing_socket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      // if (data.status === true) {
+
+      var contact_details = data.own_user_number + ' is typing'
+      // console.log(data.own_user_number);
+      for (let i = 0; i < phonebook.length; i++) {
+        if (phonebook[i][1] == data.own_user_number) {
+          contact_details = phonebook[i][0] + ' is typing'
+          break
+        }
+      }
+      if (data.status === true && data.home_channel_name != home_channel_name) {
+        document.getElementById('room_status').innerHTML = contact_details
+        previous_connection = data.home_channel_name
+        // console.log(data.message);
+      }
+      if (data.status === false) {
+        document.getElementById('room_status').innerHTML = '{{group_members}}'
+        // console.log(data.status + ' ' + data.channel_name);
+      }
+    }
+
+    user_typing_socket.onclose = function(e) {
+      console.error('Tpying indication socket closed unexpectedly');
+    };
+  </script>
+
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+</body>
+
+</html>

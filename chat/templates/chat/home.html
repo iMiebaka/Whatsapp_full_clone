@@ -1,0 +1,431 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+  <style>
+    html,
+    body {
+      /* position: relative; */
+      height: 100%;
+    }
+
+    /* body {
+      background: #eee;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    } */
+
+    .swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Whatsapp </div>
+      <!-- <img src="images/me.jpg" /> -->
+      <div class="sidebar-header-icons">
+        <!-- <img src="images/search-icon.svg" /> -->
+        <a href="{% url 'accounts:add_options' 1 %}">
+          <span class="icon-add"></span>
+        </a>
+        <!-- <span class="icon-edit"></span> -->
+        <span class="icon-ellipsis-v"></span>
+
+        <!-- <img src="images/menu-icon.svg" /> -->
+      </div>
+    </div>
+    <div class="swiper-container" id="swiper_container">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">Camera
+          <div class="" style="width:400px; background: #ccc; border:10px solid #ddd; margin: 0 auto;">
+            <video autoplay width="400" height="400" id="video"> </video>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+
+          <div class="chats">
+            {% for public_room in public_rooms %}
+            <a href="{% url 'chat_zone:group_room' public_room.channel_name.channel_name_main %}" id="{{public_room.channel_name.channel_name_main}}">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{{ public_room.cover_image.url }}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">{{ public_room.chat_room_name }}</span>
+                    <span class="chat-date">{{public_room.last_message_time_value}}</span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message" id="message_{{public_room.channel_name.channel_name_main}}">{{ public_room.last_message }}</span>
+                    </div>
+                    <div class="chat-right-bottom-right">
+                      {% if public_room.message_count > 0 %}
+                      <span class="unread-messages-number">{{public_room.message_count}}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+            {% endfor %}
+
+            {% for private_room in private_rooms %}
+            <a href="{% url 'chat_zone:private_room' private_room.profile.remote_channel_name %}" id="{{private_room.profile.remote_channel_name}}">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{{ private_room.profile.cover_image.url }}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">{{ private_room.profile.contact_name_typing }}</span>
+                    <span class="chat-date">{{ private_room.profile.last_message_time}}</span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message" id="message_{{private_room.profile.remote_channel_name}}">{{ private_room.profile.last_message.media }}</span>
+                    </div>
+                    <div class="chat-right-bottom-right">
+                      {% if private_room.profile.message_count > 0 %}
+                      <span class="unread-messages-number">{{private_room.profile.message_count}}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+            {% endfor %}
+
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="mystatus-staus">
+            <a href="#">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{% static 'images/me.jpg' %}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">My Status</span>
+                    <span style="font-size: 15px;" class="chat-date-2 icon-ellipsis-h"></span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message">Yesterday, 5:10pm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <hr class="break-line">
+          <!--
+          <p></p> -->
+          </br>
+
+          <div class="other-staus">
+
+            <a href="#">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{% static 'images/me.jpg' %}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">John Doe</span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message">Just Now</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <hr class="break-line">
+
+            <a href="#">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{% static 'images/me.jpg' %}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">Jane Doe</span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message">Yesterday, 9:10pm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <hr class="break-line">
+
+            <a href="#">
+              <div class="chat">
+                <div class="chat-left">
+                  <img src="{% static 'images/alice.jpg' %}" />
+                </div>
+                <div class="chat-right">
+                  <div class="chat-right-top">
+                    <span class="contact-name">Alice</span>
+                  </div>
+                  <div class="chat-right-bottom">
+                    <div class="chat-right-bottom-left">
+                      <span class="chat-message">Yesterday, 5:10pm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+          </div>
+        </div>
+        <div class="swiper-slide">Calls</div>
+      </div>
+    </div>
+    <!-- FAB -->
+    <div id="at-about-fab">
+      <a onclick="fab_function()">
+        <div class="at-about-fab">
+          <div class="at-about-fab__thumbnail">
+            <span id="message_fab" class="icon-message"></span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <!-- SB -->
+  <div id="snackbar">Some text some message..</div>
+  <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'js/hammer.js' %}"></script>
+
+  <script>
+    var swiper = new Swiper('.swiper-container');
+    swiper.slideNext()
+
+    var myElement = document.getElementById('swiper_container');
+
+    // create a simple instance
+    // by default, it only adds horizontal recognizers
+    var mc = new Hammer(swiper_container);
+
+    // listen to events...
+    mc.on("panleft panright", function(ev) {
+      document.getElementById('at-about-fab').removeAttribute('hidden')
+      if (swiper.realIndex === 1) {
+        document.getElementById('message_fab').setAttribute('class', 'icon-message')
+      } else if (swiper.realIndex === 2) {
+        document.getElementById('message_fab').setAttribute('class', 'icon-photo_camera')
+      } else if (swiper.realIndex === 3) {
+        document.getElementById('message_fab').setAttribute('class', 'icon-phone_in_talk')
+      } else {
+        document.getElementById('at-about-fab').setAttribute('hidden', 'true')
+      }
+    });
+
+    function fab_function() {
+      console.log((swiper.realIndex === 1))
+      if (swiper.realIndex === 1) {
+        window.location.href = "{% url 'accounts:add_to_chat' %}"
+      }
+    }
+
+    const home_channel = '{{home_channel_name}}'
+    var ws_scheme = window.location.protocol === "https:" ? "wss://" : "ws://"
+
+    const notification = new WebSocket(
+      ws_scheme +
+      window.location.host +
+      '/ws/notication_zone/' +
+      home_channel +
+      '/'
+    );
+
+    // var reply_feedback = ''
+
+    // notification.send(JSON.stringify({
+    //   // 'file_type': 'Text',
+    //   'message': message,
+    //   'message_id': message_id,
+    //   'time_stamp': time_stamp,
+    //   'room_channel_name': roomName,
+    //   'home_channel_name': home_channel_name,
+    //   'own_user_number': own_user_number
+    // }));
+    var past_message = ''
+    notification.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      // console.log(data.message);
+      // console.log("#" + data.channel_room_name);
+      // console.log(data.room_name_image);
+      // console.log(data.room_name);
+      // console.log(data.message_count);
+      // console.log(data.message_time);
+      // console.log(url.replace('ch_name', data.channel_room_name));
+      console.log(data.channel_room_name);
+      // console.log(data);
+      // console.log(data.message_type == 'Notification');
+      if (data.message_type == 'Notification') {
+        var id = 'message_' + data.channel_room_name
+        try {
+          document.getElementById(id).innerHTML = data.message
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      if (data.message_type == 'Message') {
+        try {
+          document.getElementById(data.channel_room_name).remove()
+        } catch (e) {}
+        var url = "{% url 'chat_zone:private_room' room_name='ch_name'  %}";
+        $(".chats").prepend("<a href=" + url.replace('ch_name', data.channel_room_name) + " id='" + data.channel_room_name + "'>" +
+          "<div class='chat'>" +
+          "<div class='chat-left'>" +
+          "<img src='" + data.room_name_image + "' />" +
+          "</div>" +
+          "<div class='chat-right'>" +
+          "<div class='chat-right-top'>" +
+          "<span class='contact-name'>" + data.room_name + "</span>" +
+          "<span class='chat-date'>" + data.message_time + "</span>" +
+          "</div>" +
+          "<div class='chat-right-bottom'>" +
+          "<div class='chat-right-bottom-left'>" +
+          "<span class='chat-message' id='message_" + data.channel_room_name + "'>" + data.message + "</span>" +
+          "</div>" +
+          "<div class='chat-right-bottom-right'>" +
+          "<span class='unread-messages-number'>" + data.message_count + "</span>" +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          "</a>"
+        );
+        $.ajax({
+          type: 'POST',
+          url: '{% url "chat_zone:message_read" %}',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          dataType: 'json',
+          data: {
+            room_channel_name: data.channel_room_name,
+            message_delivered: 1,
+            message_read: 0,
+            file_type: 'Text',
+          },
+          success: function(content) {
+            if (content.data) {
+              console.log('Mark as read passed');
+            } else {
+              console.log('Mark as read failed');
+            }
+          }
+        });
+
+        // const reply_feedback = new WebSocket(
+        //   ws_scheme +
+        //   window.location.host +
+        //   '/ws/reply-feedback/' +
+        //   data.channel_room_name +
+        //   '/'
+        // );
+        //
+        // reply_feedback.send(JSON.stringify({
+        //   // 'file_type': data.file_type,
+        //   'file_type': 'Text',
+        //   'feedback_state': 'delivered',
+        //   'message_id': '',
+        //   'own_user_number': data.own_user_number,
+        // }));
+        //
+        // reply_feedback.onclose = function(e) {
+        //   console.error('Feedback socket closed unexpectedly');
+        // };
+      }
+    };
+
+    notification.onclose = function(e) {
+      console.error('Chat socket 1 closed unexpectedly');
+    };
+
+    try {
+      reply_feedback.onclose = function(e) {
+        console.error('Feedback socket closed unexpectedly');
+      };
+    } catch (e) {}
+
+    var video = document.getElementById('video');
+    var vendorURL = window.URL || window.webKitURL;
+    navigator.getMedia = navigator.getUserMedia ||
+      navigator.webkitUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
+
+    // navigator.getUserMedia(mediaStreamConstraints, function(stream) {
+    //     if (peer) {
+    //       peer.mediaType = mediaType == 'audio' ? 'audio' : 'video';
+    //     }
+    //     callback(stream);
+    //     // console.log(stream);
+    //     video[isGecko ? 'mozSrcObject' : 'src'] = isGecko ? stream : (window.URL || window.webkitURL).createObjectURL(stream);
+    //   },
+    //   function() {
+    //     alert('Could not connect camera!');
+    //   });
+
+    navigator.getMedia({
+      video: true,
+      audio: false
+    }, function(stream) {
+      console.log(stream);
+      video.srcObject = stream;
+      video.play();
+    }, function(error) {
+      console.log(error.code);
+    });
+  </script>
+
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+
+</body>
+
+</html>

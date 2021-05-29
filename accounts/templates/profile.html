@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Edit Profile</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+  <style>
+    html,
+    body {
+      /* height: 100%; */
+    }
+
+    .swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Whatsapp </div>
+      <div class="sidebar-header-icons">
+      </div>
+    </div>
+    <div class="sign_up">
+      <div class="signup-type-message-bar">
+        <div class="signup-type-message-bar-center">
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Enter username" />
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Enter your phone number" />
+          <input style="margin-bottom: 2rem;" type="file" accept="image/*" />
+          <button style="margin-bottom: 2rem;" class="sign_up_button"> Update</button>
+          <!-- <button type="button" name="button"></button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

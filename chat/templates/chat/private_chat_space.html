@@ -1,0 +1,662 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="main">
+      <!-- Main chat window header -->
+      <div class="chat-window-header">
+        <div class="chat-window-header-left">
+          <a href={% url 'chat_zone:index' %}>
+            <span class=" icon-arrow_back" id="close_chat_to_menu"></span>
+            <img class="chat-window-contact-image" src="{{ profile_picture.url }}" />
+          </a>
+          <!-- <a href="#" id="go-to-user"></a> -->
+          <div class="contact-name-and-status-container">
+            <span class="chat-window-contact-name">{{contact_name}}</span>
+            <span id="room_status" class="chat-window-contact-status">{{status}}</span>
+          </div>
+        </div>
+        <div class="chat-window-header-right">
+          <span class="icon-video-camera"></span>
+          <span class="icon-phone"></span>
+          <span class="chat-window-menu-icon icon-ellipsis-v"></span>
+        </div>
+      </div>
+      <!-- Chat window -->
+      <div class="chat-window" id="chat-window">
+        <!-- New Messages come here -->
+
+        {% for message in chat_messages %}
+        {% if message.file_type == 'Text' %}
+        {% if message.sent_by == user %}
+        <div class="sender" id="{{message.message_id}}">
+          <span class="sender-message-tail"><img src="{% static 'images/message-tail-sender.svg' %}" /></span>
+          <span class="sender-message">{{message.media}}</span>
+          <span class="message-time">{{message.created_on.time}}</span>
+          {% if message.message_status == 3 %}
+          <span class="message-status" id="status_{{message.message_id}}"><img src="{% static 'images/double-check-seen.svg'%}" /></span>
+          {% elif message.message_status == 2 %}
+          <span class="message-status" id="status_{{message.message_id}}"><img src="{% static 'images/double-check-unseen.svg'%}" /></span>
+          {% else %}
+          <span class="message-status" id="status_{{message.message_id}}"><img src="{% static 'images/single-check.svg'%}" /></span>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="receiver" id="{{message.message_id}}">
+          <span class="receiver-message-tail"><img src="{% static 'images/message-tail-receiver.svg' %}" /></span>
+          <span class="receiver-message">{{message.media}}</span>
+          <span class="message-time">{{message.created_on.time}}</span>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        <!-- <div class="receiver receiver-audio-message">
+          <div class="audio-message">
+            <div class="audio-message-left">
+              <a onclick="play_media(this.id)" class="play" id="http://localhost:8000/media/Linda_Ronstadt_&_James_Ingram_-_Somewhere_Out_There(128k).mp3">
+                <img src="{% static 'images/play-audio-icon.svg' %}" />
+              </a>
+            </div>
+            <div class="audio-message-center">
+              <div class="audio-message-center-top">
+                <span class="audio-message-bar"></span>
+                <input type="range" min="0" max="100" value="0" />
+              </div>
+              <div class="audio-message-center-bottom">
+                <div class="audio-message-bottom">
+                  <span class="audio-message-length">1:15</span>
+                  <span class="message-time">21:38</span>
+                </div>
+              </div>
+            </div>
+            <div class="audio-message-right">
+              <img class="audio-message-contact-image" src="{{ profile_picture.url }}" />
+              <img class="audio-message-microphone" src="images/microphone-seen.svg" />
+            </div>
+          </div>
+        </div> -->
+
+        <div id="md-20-spacer" class="md-20-spacer">
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+      </div>
+      <!-- Type message bar -->
+      <div class="type-message-bar">
+        <div id="snackbar">Some text some message..</div>
+        <div class="type-message-bar-left">
+          <img src="{% static 'images/icons.svg' %}" />
+          <img src="{% static 'images/attach-icon.svg' %}" />
+        </div>
+        <div class="type-message-bar-center">
+          <input type="text" oninput="message_text_box(this.value)" id="message_text_box" placeholder="Type a message" />
+        </div>
+        <div class="type-message-bar-right">
+          <button type="button" id="cancel_message_button" onclick="cancel_message_button()" name="button" hidden>
+            <span class="icon-cancel"></span>
+          </button>
+          <button type="button" id="send_message_button" name="button" onclick="send_message_button()">
+            <span id="test_voice_note" class="icon-microphone"></span>
+            <!-- <span class="icon-send2"></span> -->
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/md5.js' %}"></script>
+
+<script type="text/javascript">
+  document.getElementById('message_text_box').value = ''
+  var message_id = ''
+  var session_key = md5('chat_app' + Date());
+  $('#message_text_box').focus();
+  const own_user_number = '{{own_user_number}}'
+  const room_mate_home_channel_name = '{{room_mate_home_channel_name}}'
+  const home_channel_name = '{{home_channel_name}}'
+  const phonebook = JSON.parse('{{phonebook | safe}}')
+
+  let playing_voice_note = false
+  let room_mate_availabilty = true
+  let previous_voice_note = ''
+
+  // Recording API Variables
+  var leftchannel = [];
+  var rightchannel = [];
+  var recorder = null;
+  var recordingLength = 0;
+  var volume = null;
+  var mediaStream = null;
+  var sampleRate = 44100;
+  var context = null;
+  var blob = null;
+
+  // let song = new Audio(audio_flie)
+
+  // //For voice_note
+  // function play_media(id) {
+  //   // e.preventDefault()
+  //   if (id != previous_voice_note) {
+  //     if (playing_voice_note === true) {
+  //       song.pause();
+  //     }
+  //     playing_voice_note = false
+  //     previous_voice_note = ''
+  //     console.log('New note');
+  //     song = new Audio(id)
+  //   }
+  //   if (playing_voice_note === true) {
+  //     song.pause();
+  //     playing_voice_note = false
+  //     console.log('Note paused');
+  //   } else {
+  //     song.play();
+  //     playing_voice_note = true
+  //     previous_voice_note = id
+  //     console.log('Note played');
+  //   }
+  //   console.log(document.getElementById(id).className)
+  // }
+
+  if ($('#message_text_box').val() === '') {
+    var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+  } else {
+    var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-send2')
+  }
+
+  document.getElementById('message_text_box').addEventListener("keydown", function(e) {
+    if (e.keyCode == 13) {
+      add_message()
+    }
+  });
+
+  function message_text_box(value) {
+    if (value === '') {
+      var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+      user_typing_socket.send(JSON.stringify({
+        // 'file_type': 'text',
+        'status': false,
+        'file_type': 'Text',
+        'home_channel_name': home_channel,
+        'room_channel_name': roomName,
+        'own_user_number': own_user_number,
+        'scope': 'private'
+      }));
+
+      // reply_feedback.send(JSON.stringify({
+      //   'file_type': 'Notification',
+      //   'feedback_state': 'typing',
+      //   'message_id': false,
+      //   'own_user_number': data.own_user_number,
+      // }));
+    } else {
+      var tbc = document.getElementById('test_voice_note').setAttribute('class', 'icon-send2')
+
+      user_typing_socket.send(JSON.stringify({
+        'status': true,
+        'file_type': 'Text',
+        'home_channel_name': home_channel,
+        'room_channel_name': roomName,
+        'own_user_number': own_user_number,
+        'scope': 'private'
+      }));
+
+      // reply_feedback.send(JSON.stringify({
+      //   'file_type': 'Notification',
+      //   'feedback_state': 'read',
+      //   'message_id': '',
+      //   'own_user_number': data.own_user_number,
+      // }));
+    }
+  }
+
+  function check_stat() {
+    $.ajax({
+      type: 'GET',
+      url: '{% url "accounts:check_status" %}',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      dataType: 'json',
+      data: {
+        channel_name: room_mate_home_channel_name
+      },
+      success: function(content) {
+        if (content.data) {
+          room_mate_availabilty = true;
+        } else {
+          room_mate_availabilty = false;
+        }
+      }
+    });
+  }
+
+  // var interval = setInterval(check_stat, 10000);
+
+  function add_message() {
+    var message = $('#message_text_box').val().trim()
+    message_id = md5(message + Date())
+    if (message != '' && recording_note === false) {
+      check_stat();
+      try {
+        document.getElementById('md-20-spacer').remove()
+      } catch (error) {}
+      let time_stamp = new Date();
+      time_stamp = time_stamp.getHours() + ":" + time_stamp.getMinutes()
+      console.log(room_mate_availabilty);
+      if (room_mate_availabilty) {
+        var tail = "<span class='message-status' id='status_" + message_id + "'><img src='{% static 'images/double-check-unseen.svg'%}' /></span>  </div>"
+      } else {
+        var tail = "<span class='message-status' id='status_" + message_id + "'><img src='{% static 'images/single-check.svg'%}' /></span>  </div>"
+      }
+      // console.log(check_stat());
+      $('.chat-window').append("<div class='sender' id='" + message_id + "'>" +
+        "<span class='sender-message-tail'><img src='{% static 'images/message-tail-sender.svg'%}' /></span>" +
+        "<span class='sender-message' id='text_" + message_id + "'>" + $('#message_text_box').val() + "</span>" +
+        "<span class='message-time'>" + time_stamp + "</span>" +
+        tail
+      );
+      // }
+      $('.chat-window').append('<div id="md-20-spacer" class="md-20-spacer">' +
+        '<br>' +
+        '<br>' +
+        '<br>' +
+        '<br>' +
+        '</div>'
+      );
+      sent_status_messages.push(message_id)
+      chatSocket.send(JSON.stringify({
+        'file_type': 'Text',
+        'message': message,
+        'message_id': message_id,
+        'time_stamp': time_stamp,
+        'room_channel_name': roomName,
+        'room_mate_home_channel_name': room_mate_home_channel_name,
+        'own_user_number': own_user_number
+        // 'home_channel_name': home_channel_name,
+      }));
+      document.getElementById('message_text_box').value = ''
+    } else {
+      var note_hint = ''
+      if (recording_note === false) {
+        note_hint = 'Recording voice note...'
+        document.getElementById('message_text_box').setAttribute('disabled', 'true')
+        document.getElementById('message_text_box').value = note_hint
+        document.getElementById('cancel_message_button').removeAttribute('hidden')
+        recording_note = true
+        start_making_voice_note()
+      } else {
+        note_hint = 'Sending voice note...'
+        document.getElementById('message_text_box').removeAttribute('disabled')
+        document.getElementById('message_text_box').value = ''
+        document.getElementById('cancel_message_button').setAttribute('hidden', 'true')
+        recording_note = false
+        stop_making_voice_note()
+      }
+      var x = document.getElementById("snackbar");
+      x.innerHTML = note_hint
+      x.className = "show";
+      setTimeout(function() {
+        x.className = x.className.replace("show", "")
+      }, 3000);
+
+    }
+    document.getElementById('test_voice_note').setAttribute('class', 'icon-microphone')
+    document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+  }
+
+  function start_making_voice_note() {
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    navigator.getUserMedia({
+        audio: true
+      },
+      function(e) {
+        console.log("user consent");
+
+        // creates the audio context
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext();
+
+        // creates an audio node from the microphone incoming stream
+        mediaStream = context.createMediaStreamSource(e);
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createScriptProcessor
+        // bufferSize: the onaudioprocess event is called when the buffer is full
+        var bufferSize = 2048;
+        var numberOfInputChannels = 2;
+        var numberOfOutputChannels = 2;
+        if (context.createScriptProcessor) {
+          recorder = context.createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels);
+        } else {
+          recorder = context.createJavaScriptNode(bufferSize, numberOfInputChannels, numberOfOutputChannels);
+        }
+
+        recorder.onaudioprocess = function(e) {
+          leftchannel.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+          rightchannel.push(new Float32Array(e.inputBuffer.getChannelData(1)));
+          recordingLength += bufferSize;
+        }
+
+        // we connect the recorder
+        mediaStream.connect(recorder);
+        recorder.connect(context.destination);
+      },
+      function(e) {
+        console.error(e);
+      });
+  }
+
+  function stop_making_voice_note() {
+    recorder.disconnect(context.destination);
+    mediaStream.disconnect(recorder);
+
+    // we flat the left and right channels down
+    // Float32Array[] => Float32Array
+    var leftBuffer = flattenArray(leftchannel, recordingLength);
+    var rightBuffer = flattenArray(rightchannel, recordingLength);
+    // we interleave both channels together
+    // [left[0],right[0],left[1],right[1],...]
+    var interleaved = interleave(leftBuffer, rightBuffer);
+
+    // we create our wav file
+    var buffer = new ArrayBuffer(44 + interleaved.length * 2);
+    var view = new DataView(buffer);
+
+    // RIFF chunk descriptor
+    writeUTFBytes(view, 0, 'RIFF');
+    view.setUint32(4, 44 + interleaved.length * 2, true);
+    writeUTFBytes(view, 8, 'WAVE');
+    // FMT sub-chunk
+    writeUTFBytes(view, 12, 'fmt ');
+    view.setUint32(16, 16, true); // chunkSize
+    view.setUint16(20, 1, true); // wFormatTag
+    view.setUint16(22, 2, true); // wChannels: stereo (2 channels)
+    view.setUint32(24, sampleRate, true); // dwSamplesPerSec
+    view.setUint32(28, sampleRate * 4, true); // dwAvgBytesPerSec
+    view.setUint16(32, 4, true); // wBlockAlign
+    view.setUint16(34, 16, true); // wBitsPerSample
+    // data sub-chunk
+    writeUTFBytes(view, 36, 'data');
+    view.setUint32(40, interleaved.length * 2, true);
+
+    // write the PCM samples
+    var index = 44;
+    var volume = 1;
+    for (var i = 0; i < interleaved.length; i++) {
+      view.setInt16(index, interleaved[i] * (0x7FFF * volume), true);
+      index += 2;
+    }
+
+    // our final blob
+    blob = new Blob([view], {
+      type: 'audio/wav'
+    });
+    var message = $('#message_text_box').val().trim()
+    message_id = md5(message + Date())
+    var form = new FormData()
+    form.append('voice_note', blob)
+    form.append('message_id', message_id)
+    form.append('channel_name', roomName)
+    $.ajax({
+      type: 'POST',
+      url: '{% url "chat_zone:upload_voice_note" %}',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'enctype': 'multipart/form-data'
+      },
+      processData: false,
+      contentType: false,
+      cache: false,
+      data: form,
+      success: function(content) {
+        if (content.data) {
+          console.log('SUCCESS');
+        }
+      }
+    });
+  }
+
+
+
+  function cancel_message_button() {
+    recorder.disconnect(context.destination);
+    mediaStream.disconnect(recorder);
+
+    var note_hint = 'Deleting voice note...'
+    var x = document.getElementById("snackbar");
+    x.innerHTML = note_hint
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+    document.getElementById('message_text_box').removeAttribute('disabled')
+    document.getElementById('message_text_box').value = ''
+    document.getElementById('cancel_message_button').setAttribute('hidden', 'true')
+    recording_note = false
+  }
+
+  function flattenArray(channelBuffer, recordingLength) {
+    var result = new Float32Array(recordingLength);
+    var offset = 0;
+    for (var i = 0; i < channelBuffer.length; i++) {
+      var buffer = channelBuffer[i];
+      result.set(buffer, offset);
+      offset += buffer.length;
+    }
+    return result;
+  }
+
+  function interleave(leftChannel, rightChannel) {
+    var length = leftChannel.length + rightChannel.length;
+    var result = new Float32Array(length);
+
+    var inputIndex = 0;
+
+    for (var index = 0; index < length;) {
+      result[index++] = leftChannel[inputIndex];
+      result[index++] = rightChannel[inputIndex];
+      inputIndex++;
+    }
+    return result;
+  }
+
+  function writeUTFBytes(view, offset, string) {
+    for (var i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
+
+  function send_message_button() {
+    add_message()
+  }
+  let recording_note = false
+  const roomName = '{{room_name}}'
+  const home_channel = '{{home_channel}}'
+  var ws_scheme = window.location.protocol === "https:" ? "wss://" : "ws://"
+
+  const chatSocket = new WebSocket(
+    ws_scheme +
+    window.location.host +
+    '/ws/private_chat/' +
+    roomName +
+    '/'
+  );
+
+  chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    try {
+      document.getElementById('md-20-spacer').remove()
+    } catch (error) {
+      //
+    }
+    // if (message_id === data.message_id) {
+    //   // return
+    //   // } else if (message_id == '' | message_id != data.message_id) {
+    // } else
+    // console.log(own_user_number);
+    // console.log(data.own_user_number);
+    if (own_user_number != data.own_user_number) {
+      $('.chat-window').append("<div class='receiver' id='" + data.message_id + "'>" +
+        "<span class='receiver-message-tail'><img src='{% static 'images/message-tail-receiver.svg' %}' /></span>" +
+        "<span class='receiver-message'>" + data.message + "</span>" +
+        "<span class='message-time'>" + data.time_stamp + "</span>"
+      );
+      $('.chat-window').append('<div id="md-20-spacer" class="md-20-spacer">' +
+        '<br>' +
+        '<br>' +
+        '<br>' +
+        '<br>' +
+        '</div>'
+      );
+      document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+      message_id = data.message_id
+      reply_feedback.send(JSON.stringify({
+        'file_type': 'Text',
+        'feedback_state': 'read',
+        'room_channel_name': data.room_channel_name,
+        'own_user_number': data.own_user_number,
+      }));
+
+      console.log(data.room_channel_name);
+      $.ajax({
+        type: 'POST',
+        url: '{% url "chat_zone:message_read" %}',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        dataType: 'json',
+        data: {
+          room_channel_name: data.room_channel_name,
+          message_delivered: 1,
+          message_read: 1,
+          file_type: 'Text',
+        },
+        success: function(content) {
+          // if (content.data) {
+          //   console.log('Mark as read passed');
+          // } else {
+          //   console.log('Mark as read failed');
+          // }
+        }
+      });
+    }
+
+    document.getElementById('room_status').innerHTML = '{{status}}'
+  }
+
+  chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+  };
+
+
+  const user_typing_socket = new WebSocket(
+    ws_scheme +
+    window.location.host +
+    '/ws/typing-notification/' +
+    roomName +
+    '/'
+  );
+  // var previous_connection = ''
+
+  user_typing_socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    if (own_user_number != data.own_user_number) {
+      // var contact_details = data.own_user_number + ' is typing'
+      var contact_details = 'typing'
+      for (let i = 0; i < phonebook.length; i++) {
+        if (phonebook[i][1] == data.own_user_number) {
+          // contact_details = phonebook[i][0] + ' is typing'
+          contact_details = 'typing'
+          break
+        }
+      }
+      if (data.status === true && data.home_channel_name != home_channel_name) {
+        document.getElementById('room_status').innerHTML = contact_details
+      }
+      if (data.status === false) {
+        document.getElementById('room_status').innerHTML = '{{status}}'
+      }
+    }
+  }
+
+  user_typing_socket.onclose = function(e) {
+    console.error('Tpying indication socket closed unexpectedly');
+  };
+
+  const reply_feedback = new WebSocket(
+    ws_scheme +
+    window.location.host +
+    '/ws/reply-feedback/' +
+    roomName +
+    '/'
+  );
+
+
+
+
+  let sent_status_messages = []
+  reply_feedback.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log(own_user_number)
+    console.log(data.own_user_number)
+    if (own_user_number == data.own_user_number) {
+      if (data.feedback_state == 'read') {
+        for (i = 0; i < sent_status_messages.length; i++) {
+          var mess_id = 'status_' + sent_status_messages[i]
+          document.getElementById(mess_id).innerHTML = "<img src='{% static 'images/double-check-seen.svg'%}' />"
+        }
+        console.log(sent_status_messages)
+        sent_status_messages = []
+      }
+      if (data.feedback_state == 'delivered') {
+        for (i = 0; i < sent_status_messages.length; i++) {
+          var mess_id = 'status_' + sent_status_messages[i]
+          document.getElementById(mess_id).innerHTML = "<img src='{% static 'images/double-check-unseen.svg'%}' />"
+        }
+        console.log(sent_status_messages)
+        sent_status_messages = []
+      }
+      document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+    }
+  }
+
+  reply_feedback.onclose = function(e) {
+    console.error('Feedback socket closed unexpectedly');
+  };
+</script>
+
+<script type="text/javascript">
+  '{% if messages %}'
+  '{% for message in messages %}'
+
+  var x = document.getElementById("snackbar");
+  x.innerHTML = '{{message}}'
+  x.className = "show";
+  setTimeout(function() {
+    x.className = x.className.replace("show", "")
+  }, 3000);
+
+  '{% endfor %}'
+  '{% endif %}'
+</script>
+
+</html>

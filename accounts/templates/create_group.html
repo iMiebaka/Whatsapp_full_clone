@@ -1,0 +1,49 @@
+{% load static}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}" />
+<link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+<link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Create Group </div>
+      <div class="sidebar-header-icons">
+      </div>
+    </div>
+    <div class="sign_up">
+      <div class="signup-type-message-bar">
+        <div class="signup-type-message-bar-center">
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Group Name" />
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Group room description" />
+          <input style="margin-bottom: 2rem;" type="file" accept="image/*" />
+          <button style="margin-bottom: 2rem;" class="sign_up_button"> Create Group</button>
+          <!-- <button type="button" name="button"></button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swiper JS -->
+  <script src="swiper-bundle.min.js"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+    var swiper = new Swiper('.swiper-container');
+    swiper.realIndex = 1
+    console.log(swiper.realIndex);
+  </script>
+</body>
+
+</html>

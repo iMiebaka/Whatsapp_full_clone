@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Register</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Add Contact </div>
+      <div class="sidebar-header-icons">
+      </div>
+    </div>
+    <div class="sign_up">
+      <div class="signup-type-message-bar">
+        <form class="signup-type-message-bar-center" method="post" action="{% url 'accounts:verify_account_sms' %}">
+          {% csrf_token %}
+          <div class="">
+            Please enter OTP code
+          </div>
+          <input style="margin-bottom: 0.5rem;" type="text" name="otp" placeholder="Enter OTP" />
+          <button style="margin-bottom: 0.5rem;" class="sign_up_button"> Validate OTP</button>
+          <!-- <button type="button" name="button"></button> -->
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="snackbar">
+  </div>
+  <script type="text/javascript">
+  </script>
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+</body>
+
+</html>

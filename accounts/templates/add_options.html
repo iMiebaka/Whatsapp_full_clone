@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+  <!-- Demo styles -->
+  <style>
+    html,
+    body {
+      /* position: relative; */
+      height: 100%;
+    }
+
+    .swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <a href={% url 'chat_zone:index' %}>
+        <span class=" icon-arrow_back" id="close_chat_to_menu">
+          <div class="app-title" id="app-title">
+          </div>
+        </span>
+      </a>
+      <!-- <img src="images/me.jpg" /> -->
+      <div class="sidebar-header-icons">
+        <!-- <img src="images/search-icon.svg" /> -->
+        <span onclick="add_contact()" class="icon-perm_phone_msg"></span>
+        <!-- <span class="icon-edit"></span> -->
+        <span onclick="create_group()" class="icon-group"></span>
+      </div>
+    </div>
+    <div class="swiper-container" id="swiper_container">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="other-feature" style="  margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 100vh;">
+            <span class="contact-name">Add Contact</span>
+            <form class="" action="{% url 'accounts:add_contact' %}" method="post">
+              {% csrf_token %}
+              <input style="margin-bottom: 2rem;" type="text" required name="name" placeholder="Enter Name" />
+              <br>
+              <input style="margin-bottom: 2rem;" type="text" required name="phonenumber" placeholder="Enter your phone number" />
+              <br>
+              <button style="margin-bottom: 2rem;" class="sign_up_button"> Add Contact</button>
+              <br>
+            </form>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="other-feature" style="  margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 100vh;">
+            <span class="contact-name">Create Group</span>
+            <form class="" action="{% url 'accounts:create_group' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input style="margin-bottom: 2rem;" required type="text" name="group_name" placeholder="Group Name" />
+              <br>
+              <input style="margin-bottom: 2rem;" type="text" name="group_description" placeholder="Group room description" />
+              <br>
+              <select style="margin-bottom: 2rem;" type="text" required name="contact" multiple>
+                <option value="" disabled>Select Contact</option>
+                {% if contacts %}
+                {% for contact in contacts %}
+                <option value="{{contact.number}}">{{contact.contact_name}}</option>
+                {{contact.number}} {{contact.contact_name}}
+                {% endfor %}
+                {% else %}
+                <p>None of your contact is on whatsapp</p>
+                {% endif %}
+              </select>
+              <br>
+              <input style="margin-bottom: 2rem;" type="file" name="group_image" accept="image/*" />
+              <br>
+              <button style="margin-bottom: 2rem;" class="sign_up_button" type="submit"> Create Group</button>
+              <br>
+          </div>
+          </form>
+          <!-- </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SB -->
+  <div id="snackbar"></div>
+
+
+  <!-- Swiper JS -->
+  <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'js/hammer.js' %}"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+    var swiper = new Swiper('.swiper-container');
+    var slid_check = '{{ slider }}'
+    if (slid_check == 2) {
+      swiper.slideNext()
+    }
+
+    function add_contact() {
+      swiper.slidePrev()
+    }
+
+    function create_group() {
+      swiper.slideNext()
+    }
+    var myElement = document.getElementById('swiper_container');
+
+    // create a simple instance
+    // by default, it only adds horizontal recognizers
+    var mc = new Hammer(swiper_container);
+
+    // listen to events...
+    mc.on("panleft panright", function(ev) {
+      if (swiper.realIndex === 0) {
+        // document.getElementById('app-title').innerHTML = 'Add Contact'
+      }
+      if (swiper.realIndex === 1) {
+        // document.getElementById('app-title').innerHTML = 'Create Group'
+      }
+    });
+  </script>
+
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+
+</body>
+
+</html>

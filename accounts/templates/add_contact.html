@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Whatsapp</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="swiper-bundle.min.css">
+  <link rel="stylesheet" href="fonts/icomoon/style.css">
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <link rel="icon" href="images/favicon.ico" />
+
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Add Contact </div>
+      <div class="sidebar-header-icons">
+      </div>
+    </div>
+    <div class="sign_up">
+      <div class="signup-type-message-bar">
+        <div class="signup-type-message-bar-center">
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Enter Name" />
+          <input style="margin-bottom: 2rem;" type="text" placeholder="Enter your phone number" />
+          <button style="margin-bottom: 2rem;" class="sign_up_button"> Add Contact</button>
+          <!-- <button type="button" name="button"></button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swiper JS -->
+  <script src="swiper-bundle.min.js"></script>
+
+  <!-- Initialize Swiper -->
+  <script>
+    var swiper = new Swiper('.swiper-container');
+    swiper.realIndex = 1
+    console.log(swiper.realIndex);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" />
+
+
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">
+        Login </div>
+      <div class="sidebar-header-icons">
+      </div>
+    </div>
+    <div class="sign_up">
+      <div class="signup-type-message-bar">
+        <div class="signup-type-message-bar-center">
+          <form class="" action="{% url 'accounts:login' %}" method="post">
+            {% csrf_token %}
+            <input style="margin-bottom: 2rem;" type="text" id="number" name="phonenumber" placeholder="Enter your phone number" />
+            <button style="margin-bottom: 2rem;" type="submit" class="sign_up_button"> Login</button>
+          </form>
+          <a style="width: 4rem;" href="{% url 'accounts:signup' %}" class="sign_up_button"> Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="snackbar"></div>
+
+  <script type="text/javascript">
+    document.getElementById('number').focus()
+  </script>
+  <script type="text/javascript">
+    '{% if messages %}'
+    '{% for message in messages %}'
+
+    var x = document.getElementById("snackbar");
+    x.innerHTML = '{{message}}'
+    x.className = "show";
+    setTimeout(function() {
+      x.className = x.className.replace("show", "")
+    }, 3000);
+
+    '{% endfor %}'
+    '{% endif %}'
+  </script>
+</body>
+
+</html>
