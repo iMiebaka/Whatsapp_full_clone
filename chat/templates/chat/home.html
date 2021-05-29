@@ -386,19 +386,7 @@
       navigator.webkitUserMedia ||
       navigator.mozGetUserMedia ||
       navigator.msGetUserMedia;
-
-    // navigator.getUserMedia(mediaStreamConstraints, function(stream) {
-    //     if (peer) {
-    //       peer.mediaType = mediaType == 'audio' ? 'audio' : 'video';
-    //     }
-    //     callback(stream);
-    //     // console.log(stream);
-    //     video[isGecko ? 'mozSrcObject' : 'src'] = isGecko ? stream : (window.URL || window.webkitURL).createObjectURL(stream);
-    //   },
-    //   function() {
-    //     alert('Could not connect camera!');
-    //   });
-
+      
     navigator.getMedia({
       video: true,
       audio: false
