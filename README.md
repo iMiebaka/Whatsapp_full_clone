@@ -34,7 +34,7 @@ cd Whatsapp_full_clone/
     ```shell
     celery -A mysite worker -l INFO
     ```
-* Open your browser and enter <a href="http://localhost.com:8000" target="_blank" rel="noopener noreferrer""> Go to WhatsApp Clone page</a>
+* <a href="http://localhost.com:8000" target="_blank" rel="noopener noreferrer"> Go to WhatsApp Clone on localhost</a>
 
 <a href="https://channels.readthedocs.io/en/stable" target="_blank" rel="noopener noreferrer"> Need more knowledge on Django Websocket? Check out the Channels Documention</a> </br>
 <a href="https://docs.djangoproject.com/en/3.2/releases/3.0/" target="_blank" rel="noopener noreferrer"> Check out the Django 3 Document for recents update to the framework</a>
