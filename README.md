@@ -29,4 +29,4 @@ cd Whatsapp_full_clone/
     * On the second window `celery -A mysite worker -l INFO`
 * Open your browser and enter <a>http://localhost.com:8000</a>
 
-<a href="https://channels.readthedocs.io/en/stable"> Check out the Channels Documention on how the WebSocket works</a>
+<a href="https://channels.readthedocs.io/en/stable" target="_blank" rel="noopener noreferrer"> Check out the Channels Documention on how the WebSocket works</a>
