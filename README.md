@@ -2,7 +2,7 @@
 
 <p align="center"><img width="100%" src="https://github.com/triple07even/Whatsapp_full_clone/blob/main/private_chat_screenshot.png" alt="Private chat screenshot"></p>
 
-Warning: This app is not a production
+Warning: This app is not for production
 
 This project is a Whatsapp clone using JavaScript and Python </br>
 The python framework used in this build is Django
