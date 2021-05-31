@@ -5,9 +5,9 @@
 Warning: This app is not a production
 
 This project is a Whatsapp clone using JavaScript and Python </br>
-The python framework used in this build in Django
+The python framework used in this build is Django
 
-Install Redis on Linux/ Unix (Version >=6)
+Install Redis on Linux/Unix (Version >=6)
 ```shell
 sudo apt update
 sudo apt-get install redis-server
@@ -37,4 +37,4 @@ cd Whatsapp_full_clone/
 * <a href="http://localhost.com:8000" target="_blank" rel="noopener noreferrer"> Go to WhatsApp Clone on localhost</a>
 
 <a href="https://channels.readthedocs.io/en/stable" target="_blank" rel="noopener noreferrer"> Need more knowledge on Django Websocket? Check out the Channels Documention</a> </br>
-<a href="https://docs.djangoproject.com/en/3.2/releases/3.0/" target="_blank" rel="noopener noreferrer"> Check out the Django 3 Document for recents update to the framework</a>
+<a href="https://docs.djangoproject.com/en/3.2/releases/3.0/" target="_blank" rel="noopener noreferrer"> Check out the Django 3 Document for recents update on to the framework</a>
