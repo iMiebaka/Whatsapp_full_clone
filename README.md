@@ -5,7 +5,7 @@
 This project is a Whatsapp clone using JavaScript and Python
 The python framework used in this build in Django
 
-<h5> Warning: This app is not a production </h5>
+Warning: This app is not a production
 
 Note: Make sure you have Redis Installed (Version >=6)
 
