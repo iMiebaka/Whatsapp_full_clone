@@ -2,7 +2,7 @@
 
 <p align="center"><img width="100%" src="https://github.com/triple07even/Whatsapp_full_clone/blob/main/private_chat_screenshot.png" alt="Private chat screenshot"></p>
 
-This project is a Whatsapp clone using JavaScript and Python
+This project is a Whatsapp clone using JavaScript and Python </br>
 The python framework used in this build in Django
 
 Warning: This app is not a production
@@ -23,7 +23,7 @@ source env/bin/activate
 git clone https://github.com/triple07even/Whatsapp_full_clone
 cd Whatsapp_full_clone/
 ```
-  * Install all dependencies required: `pip install -r requirements.txt`
+  * Install all dependencies required: ```pip install -r requirements.txt```
   * Open two command line window
     * For the first window `python manage.py runserver 0:8000`
     * On the second window `celery -A mysite worker -l INFO`
