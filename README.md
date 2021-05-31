@@ -21,10 +21,13 @@ source env/bin/activate
 git clone https://github.com/triple07even/Whatsapp_full_clone
 cd Whatsapp_full_clone/
 ```
-  * Install all dependencies required: ```pip install -r requirements.txt```
+  * Install all dependencies required:
+  ```shell
+  pip install -r requirements.txt
+  ```
   * Open two command line window
     * For the first window, use this command to run the Python app: `python manage.py runserver 0:8000`
     * On the second window, use this command to run the task Queuing service `celery -A mysite worker -l INFO`
-* Open your browser and enter <a>http://localhost.com:8000</a>
+* Open your browser and enter <a href="http://localhost.com:8000" target="_blank"> Go to WhatsApp CLone page</a>
 
-<a href="https://channels.readthedocs.io/en/stable" target="_blank" rel="noopener noreferrer"> Check out the Channels Documention on how the WebSocket works</a>
+<a href="https://channels.readthedocs.io/en/stable" target="_blank" rel="noopener noreferrer"> Need more knowledge on Django Websocket? Check out the Channels Documention</a>
