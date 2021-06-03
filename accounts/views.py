@@ -31,7 +31,7 @@ def signup(request):
         hash_channel_name = hashlib.md5(home_channel_name_token.encode())
         home_channel_name = hash_channel_name.hexdigest()
         email_address = '%s@whatsapp.com'%phonenumber
-        if phonenumber == '' | country == '':
+        if phonenumber == '' or country == '':
             messages.error(request,'Please make sure phone number and country are provided')
             return render(request, 'signup.html')
 
@@ -335,9 +335,9 @@ def verify_account_sms(request):
         except Profile.DoesNotExist:
             messages.error(request, "User does not exist")  # False Call
             return render(request, 'otp-waiting.html')
-        # rt_valu = str(phonenumber) + str(datetime.date(datetime.now())) + OTP_KEY
-        # key = base64.b32encode(rt_valu.encode())  # Generating Key
-        # OTP = pyotp.HOTP(key)  # HOTP Model
+        rt_valu = str(phonenumber) + str(datetime.date(datetime.now())) + OTP_KEY
+        key = base64.b32encode(rt_valu.encode())  # Generating Key
+        OTP = pyotp.HOTP(key)  # HOTP Model
         if Mobile.isVerified:
             messages.error(request, 'OTP is expired')
             return render(request, 'otp-waiting.html')

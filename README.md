@@ -16,16 +16,17 @@ redis-cli -v
 
 Application Installation
 ```shell
-python3 -m venv env
-source env/bin/activate
 git clone https://github.com/triple07even/Whatsapp_full_clone
 cd Whatsapp_full_clone/
+python3 -m venv env
+source env/bin/activate
 ```
   * Install all dependencies required
   ```shell
   pip install -r requirements.txt
   ```
   * Open two command line window
+    NB: Both command windows should be in the Whatsapp_full_clone directory and virtual activated
     * For the first window, use this command to run the Python app
     ```shell
     python manage.py runserver 0:8000
