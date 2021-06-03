@@ -25,13 +25,11 @@ source env/bin/activate
   ```shell
   pip install -r requirements.txt
   ```
-  * Open two command line window
-    NB: Both command windows should be in the Whatsapp_full_clone directory and virtual activated
-    * For the first window, use this command to run the Python app
-    ```shell
-    python manage.py runserver 0:8000
-    ```
-    * On the second window, use this command to run the task Queuing service
+  * For the first window, use this command to run the Python app
+  ```shell
+  python manage.py runserver 0:8000
+  ```
+    * Open another command window (in the same directry and virtual enviroment activated), use this command to run the task Queuing service
     ```shell
     celery -A mysite worker -l INFO
     ```
