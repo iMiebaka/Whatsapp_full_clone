@@ -193,7 +193,6 @@ def add_to_chat(request):
                         added_contact_runner = User.objects.get(username=us),
                         contact_channel = Profile.objects.get(user=us).home_channel_name,
                         channel_name = channel_name)
-                    # chat_channel.append(str(cbc.channel_name))
             except User.DoesNotExist:
                 pass
         # contacts = PhoneBook.objects.filter(number__in=filtered_list)
@@ -203,8 +202,6 @@ def add_to_chat(request):
         contacts_details = User.objects.filter(username__in=filtered_list)
         print(contacts_details)
         content = {
-            # 'contacts': contacts,
-            # 'contacts_channel_names':contacts_channel_name
             'contacts_details':contacts_details
         }
         return render(request, 'add_to_chat.html', content)
@@ -277,7 +274,7 @@ def create_group(request):
                 channel_name_type = 'public'
                 )
             messages.success(request, '%s, has been successfully created'%group_name)
-            return redirect('chat_zone:group_room', hash_value)
+            return redirect('chat_zone:public_room', hash_value)
         except:
             channel_name_in.delete()
             create_group.delete()

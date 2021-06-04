@@ -262,7 +262,7 @@
       } catch (error) {}
       let time_stamp = new Date();
       time_stamp = time_stamp.getHours() + ":" + time_stamp.getMinutes()
-      console.log(room_mate_availabilty);
+      // console.log(room_mate_availabilty);
       if (room_mate_availabilty) {
         var tail = "<span class='message-status' id='status_" + message_id + "'><img src='{% static 'images/double-check-unseen.svg'%}' /></span>  </div>"
       } else {
@@ -609,9 +609,6 @@
     roomName +
     '/'
   );
-
-
-
 
   let sent_status_messages = []
   reply_feedback.onmessage = function(e) {

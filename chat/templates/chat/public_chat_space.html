@@ -91,7 +91,6 @@
   <script type="text/javascript" src="{% static 'js/md5.js' %}"></script>
 
   <script type="text/javascript">
-    // document.getElementById('message_text_box').focus()
     var message_id = ''
     var session_key = md5('chat_app' + Date());
     $('#message_text_box').focus();
@@ -121,7 +120,6 @@
           'home_channel_name': home_channel_name,
           'own_user_number': own_user_number,
           'scope': 'public'
-
         }));
 
       } else {
@@ -148,7 +146,7 @@
         time_stamp = time_stamp.getHours() + ":" + time_stamp.getMinutes()
         $('.chat-window').append("<div class='sender' id=" + message_id + ">" +
           "<span class='sender-message-tail'><img src='{% static 'images/message-tail-sender.svg'%}' /></span>" +
-          "<span class='sender-message'>" + $('#message_text_box').val() + "</span>" +
+          "<span class='sender-message'>" + document.querySelector('#message_text_box').value + "</span>" +
           "<span class='message-time'>" + time_stamp + "</span>" +
           "<span class='message-status'><img src='{% static 'images/single-check.svg'%}' /></span>  </div>"
         );
@@ -210,7 +208,7 @@
       }
       if (message_id === data.message_id) {
         // return
-      } else if (message_id == '') {
+      } else if (message_id == '' | message_id != data.message_id) {
         $('.chat-window').append("<div class='receiver'>" +
           "<span class='receiver-message-tail'><img src='{% static 'images/message-tail-receiver.svg' %}' /></span>" +
           "<span class='receiver-by'>" + contact_details + "</span>" +
@@ -227,6 +225,30 @@
         );
         message_id = data.message_id
         document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+        document.getElementById('room_status').innerHTML = '{{group_members}}'
+
+        $.ajax({
+          type: 'POST',
+          url: '{% url "chat_zone:message_read" %}',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          dataType: 'json',
+          data: {
+            room_channel_name: data.room_channel_name,
+            message_delivered: 1,
+            message_read: 1,
+            file_type: 'Text',
+          },
+          success: function(content) {
+            // if (content.data) {
+            //   console.log('Mark as read passed');
+            // } else {
+            //   console.log('Mark as read failed');
+            // }
+          }
+        });
+
       } else if (message_id != data.message_id) {
         $('.chat-window').append("<div class='receiver'>" +
           "<span class='receiver-message-tail'><img src='{% static 'images/message-tail-receiver.svg' %}' /></span>" +
@@ -244,6 +266,30 @@
         );
         message_id = data.message_id
         document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight
+        document.getElementById('room_status').innerHTML = '{{group_members}}'
+
+        $.ajax({
+          type: 'POST',
+          url: '{% url "chat_zone:message_read" %}',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          dataType: 'json',
+          data: {
+            room_channel_name: data.room_channel_name,
+            message_delivered: 1,
+            message_read: 1,
+            file_type: 'Text',
+          },
+          success: function(content) {
+            // if (content.data) {
+            //   console.log('Mark as read passed');
+            // } else {
+            //   console.log('Mark as read failed');
+            // }
+          }
+        });
+
       } else {
         console.log('Something went wrong');
       }
@@ -263,10 +309,7 @@
 
     user_typing_socket.onmessage = function(e) {
       const data = JSON.parse(e.data);
-      // if (data.status === true) {
-
       var contact_details = data.own_user_number + ' is typing'
-      // console.log(data.own_user_number);
       for (let i = 0; i < phonebook.length; i++) {
         if (phonebook[i][1] == data.own_user_number) {
           contact_details = phonebook[i][0] + ' is typing'
@@ -276,17 +319,26 @@
       if (data.status === true && data.home_channel_name != home_channel_name) {
         document.getElementById('room_status').innerHTML = contact_details
         previous_connection = data.home_channel_name
-        // console.log(data.message);
       }
       if (data.status === false) {
         document.getElementById('room_status').innerHTML = '{{group_members}}'
-        // console.log(data.status + ' ' + data.channel_name);
       }
     }
 
     user_typing_socket.onclose = function(e) {
       console.error('Tpying indication socket closed unexpectedly');
     };
+
+
+    const reply_feedback = new WebSocket(
+      ws_scheme +
+      window.location.host +
+      '/ws/reply-feedback/' +
+      roomName +
+      '/'
+    );
+
+
   </script>
 
   <script type="text/javascript">

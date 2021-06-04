@@ -48,7 +48,7 @@ def index(request):
 
 
 @login_required
-def group_room(request, room_name):
+def public_room(request, room_name):
     own_user_number = User.objects.get(username=request.user).username
     try:
         channel_name = ChannelVilla.objects.get(channel_name_main=room_name)
@@ -246,4 +246,16 @@ def message_read(request):
             content = {
                 'data': True
             }
+        return JsonResponse(content)
+
+def check_fetch(request):
+    if request.is_ajax and request.method == 'POST':
+        print(json.loads(request.body.decode("utf-8")))
+
+        # one_i = request.POST['one']
+        # print(one_1)
+        content = {
+            'data': True
+            # 'object': one_i
+        }
         return JsonResponse(content)

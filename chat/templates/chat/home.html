@@ -64,7 +64,7 @@
 
           <div class="chats">
             {% for public_room in public_rooms %}
-            <a href="{% url 'chat_zone:group_room' public_room.channel_name.channel_name_main %}" id="{{public_room.channel_name.channel_name_main}}">
+            <a href="{% url 'chat_zone:public_room' public_room.channel_name.channel_name_main %}" id="{{public_room.channel_name.channel_name_main}}">
               <div class="chat">
                 <div class="chat-left">
                   <img src="{{ public_room.cover_image.url }}" />
@@ -303,7 +303,8 @@
         try {
           document.getElementById(data.channel_room_name).remove()
         } catch (e) {}
-        var url = "{% url 'chat_zone:private_room' room_name='ch_name'  %}";
+        if (data.room_type == 'private') var url = "{% url 'chat_zone:private_room' room_name='ch_name'  %}";
+        if (data.room_type == 'public') var url = "{% url 'chat_zone:public_room' room_name='ch_name'  %}";
         $(".chats").prepend("<a href=" + url.replace('ch_name', data.channel_room_name) + " id='" + data.channel_room_name + "'>" +
           "<div class='chat'>" +
           "<div class='chat-left'>" +
@@ -386,7 +387,7 @@
       navigator.webkitUserMedia ||
       navigator.mozGetUserMedia ||
       navigator.msGetUserMedia;
-      
+
     navigator.getMedia({
       video: true,
       audio: false
@@ -397,6 +398,51 @@
     }, function(error) {
       console.log(error.code);
     });
+
+    function check_fetch1() {
+      const old_date = new Date() / 1000;
+      const url = '{% url "chat_zone:check_fetch" %}'
+      const data_field = {
+        one: 1,
+        two: 2
+      };
+      const options = {
+        method: "POST",
+        body: JSON.stringify(data_field),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        }
+      };
+      fetch(url, options)
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+          console.log(`Fetch task completed in ${(new Date() / 1000) - old_date}`);
+        });
+    }
+
+    function check_fetch2() {
+      const old_date = new Date() / 1000;
+      const url = '{% url "chat_zone:check_fetch" %}'
+      const data_field = {
+        one: 1,
+        two: 2
+      };
+      $.ajax({
+        type: 'POST',
+        url: url,
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        dataType: 'json',
+        data: JSON.stringify(data_field),
+        success: function(content) {
+          console.log(`Ajax task completed in ${(new Date() / 1000) - old_date} sec`);
+        }
+      });
+    }
   </script>
 
   <script type="text/javascript">

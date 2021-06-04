@@ -41,7 +41,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             ChannelVilla.objects.get(channel_name_main=event['room_channel_name'])
         except ChannelVilla.DoesNotExist:
 
-            # If no, register it    #This only runs once#
+            # If no, register it    This only runs once
             #Register the channel as a private one
             new_chan = ChannelVilla.objects.create(
                 channel_name_main=event['room_channel_name'],
@@ -94,6 +94,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             'room_mate_home_channel_name': room_mate_home_channel_name,
             'own_user_number': own_user_number,
             'room_channel_name': room_channel_name,
+
             # 'home_channel_name': home_channel_name,
             # 'pre_generated_channel_name': pre_generated_channel_name
             }
@@ -102,7 +103,6 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def other_channels(self, text_data_json):
-        # print('@@@@')
         auth_user = Profile.objects.get(mobile__iexact=text_data_json['own_user_number'])
         ch_name = ChannelVilla.objects.get(channel_name_main=text_data_json['room_channel_name'])
         channel_bind = ChannelBindingIdentity.objects.filter(channel_name=ch_name)
@@ -125,7 +125,8 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
                         'message': text_data_json['message'],
                         'message_count': message_count,
                         'message_type': 'Message',
-                        'message_time': timezone.now().strftime('%-I:%M %p')
+                        'message_time': timezone.now().strftime('%-I:%M %p'),
+                        'room_type': 'private'
                     })
                 print('Message sent to home channel')
 
@@ -293,7 +294,7 @@ class FeedbackChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def reply_instance(self):
         ch_name = ChannelBindingIdentity.objects.filter(channel_name__channel_name_main=self.room_name).exclude(connected_receiver=self.scope['user'])
-        own_user_number = ''
+        # own_user_number = ''
         for ch in ch_name:
             room_mate_number = ch.connected_receiver.username
         msr = MarkAsRead.objects.filter(channel_name__channel_name_main=self.room_name, message_read=False, read_by=self.scope['user']).count()
@@ -326,8 +327,7 @@ class FeedbackChatConsumer(AsyncWebsocketConsumer):
         file_type = text_data_json['file_type']
         feedback_state = text_data_json['feedback_state']
         room_channel_name = text_data_json['room_channel_name']
-        # message_id = text_data_json['message_id']
-        print('@@@@@')
+
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -404,7 +404,6 @@ class PublicChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def other_channels(self, text_data_json):
-        # print('@@@@')
         auth_user = Profile.objects.get(mobile__iexact=text_data_json['own_user_number'])
         ch_name = ChannelVilla.objects.get(channel_name_main=text_data_json['room_channel_name'])
         channel_bind = ChannelBindingIdentity.objects.filter(channel_name=ch_name)
@@ -415,7 +414,6 @@ class PublicChatConsumer(AsyncWebsocketConsumer):
                     contact_name = PhoneBook.objects.get(phone_owner=ch_b.connected_receiver, number=text_data_json['own_user_number']).contact_name
                 except PhoneBook.DoesNotExist:
                     contact_name = profile.mobile
-                # print(profile.home_channel_name)
                 grp = GroupChatRoom.objects.get(channel_name=ch_name)
                 message_count = grp.message_count(profile.user)
                 message = '%s : %s'%(contact_name, text_data_json['message'])
@@ -429,7 +427,8 @@ class PublicChatConsumer(AsyncWebsocketConsumer):
                         'message': message,
                         'message_count': message_count,
                         'message_type': 'Message',
-                        'message_time': timezone.now().strftime('%-I:%M %p')
+                        'message_time': timezone.now().strftime('%-I:%M %p'),
+                        'room_type': 'public'
                     })
 
 
@@ -490,7 +489,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
 
-        # print('@@@@')
         await self.send(text_data=json.dumps({
             'message': message,
         }))
@@ -518,7 +516,6 @@ class EventConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        # print("DISCONNECED CODE: ",code)
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -549,8 +546,6 @@ class EventConsumer(WebsocketConsumer):
         # )
 
     def send_feedback(self, event):
-        # message_id = event['message_id']
-        # room_channel_name = event['room_channel_name']
         own_user_number = event['own_user_number']
         file_type = event['file_type']
         feedback_state = event['feedback_state']
@@ -559,12 +554,9 @@ class EventConsumer(WebsocketConsumer):
             'own_user_number': own_user_number,
             'feedback_state': feedback_state,
             'file_type': file_type,
-            # 'message_id': message_id,
-            # 'room_channel_name': room_channel_name,
         }))
 
     def send_notification_to_frontend(self,event):
-        # Receive message from room group
         message = event['message']
         room_name = event['room_name']
         room_name_image = event['room_name_image']
@@ -572,8 +564,8 @@ class EventConsumer(WebsocketConsumer):
         channel_room_name = event['channel_room_name']
         message_time = event['message_time']
         message_type = event['message_type']
+        room_type = event['room_type']
 
-        # Send message to WebSocket
         self.send(text_data=json.dumps({
             'room_name_image': room_name_image,
             'room_name': room_name,
@@ -582,6 +574,7 @@ class EventConsumer(WebsocketConsumer):
             'message_count': message_count,
             'message_time': message_time,
             'message_type': message_type,
+            'room_type': room_type,
         }))
 
     def send_notification_to_home(self,event):
@@ -591,7 +584,6 @@ class EventConsumer(WebsocketConsumer):
         message_type = event['message_type']
         own_user_number = event['own_user_number']
 
-        # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
             'message_type': message_type,
